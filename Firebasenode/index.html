@@ -1,9 +1,97 @@
-<html lang="en">
+<!DOCTYPE html>
+<html>  
 <head>
-</head>
-<body>
-  <div style="font-size: 40px" id="msg"></div>
+  <meta charset = "UTF-8">    
+  <title>IOT CONTROL PANEL</title>
+</head>  
+<body>  
+    <!-- <script src="socket.io.js"></script> -->
+    <script src="/socket.io/socket.io.js"></script>  
+    <script>
+        var socket = io();  
+        var open = 0;
+        function ledon(){ //A function to on the led lights
+		    socket.emit('led:on'); 
+		    console.log('LED ON');
+            alert("LED Connected");
+        }
+        function ledoff(){ //A function to off the led lights
+            socket.emit('led:off'); 
+            console.log('LED OFF');
+            alert("LED Disconnected");
+        }
+        function motionon(){// A function to on the motion sensor
+            alert("Motion Sensor On");
+            if (open === 0){
+                socket.emit('sensor:on');
+                open++;
+            }else{
+                socket.emit('motion:bool');
+            }
+            console.log('SENSOR ON');
+            socket.on('total:motion', function(data){ //To increment the total motion in the webpage
+                var x = data.motionno;
+                var displaytotal = document.getElementById("total")
+                displaytotal.innerHTML = x;
+            });
+            socket.on('long:motion', function(data){ //To increment the number of long motion in the webpage
+                var y = data.motionlong;
+                var displaylong = document.getElementById("long") 
+                displaylong.innerHTML = y;
+            });
+            socket.on('short:motion', function(data){ //To increment the number of short motion in the webpage
+                var z = data.motionshort;
+                var displayshort = document.getElementById("short")
+                displayshort.innerHTML = z;
+            });
+        }
+        function motionoff(){ //A function to off the motion sensor
+            socket.emit('sensor:off');
+            console.log('SENSOR OFF');
+            alert("Motion Sensor Off")
+        }
+        function Reset(){
+            socket.emit('reset');
+            console.log('Data Reset!');
+            alert("Data Reset")
+        }
+    </script>
 
+    <header>
+        <h1  style="background-color: #1890E5; color: white; text-align: center; padding: 10px">IOT CONTROL PANEL</h1>
+    </header>
+    
+<aside style="text-align: center">
+
+    <h2 style="text-align: center; font-size: 200%">Control Panel</h2>
+    <div style="margin: auto; width: 30%; border: 3px solid black; padding: 30px">
+        <h4 style="font-size: 150%; position:relative; top:-50px">LED Controller</h4>
+        <button style="position:relative; top:-50px;padding: 5px 20px" onclick="ledon()">On</button>
+        <button style="position:relative; top:-50px;padding: 5px 20px" onclick="ledoff()">Off</button>
+
+        <h4 style="font-size: 150%; position:relative; top:-50px">Motion Controller</h4>
+    
+        <button style="position:relative; top:-50px;padding: 5px 20px" onclick="motionon()">On</button>
+        <button style="position:relative; top:-50px;padding: 5px 20px" onclick="motionoff()">Off</button>
+    
+
+        <h4 style="font-size: 150%; position:relative; top:-50px">Total Motion</h4>
+        <h5 style="text-align: center; position: relative; top: -50px; font-size: 100%" id="total"></h5>
+
+        <h4 style="font-size: 150%; position:relative; top:-50px">Total Intruder</h4>
+        <h5 style="text-align: center; position: relative; top: -50px; font-size: 100%" id="intruder"></h5>
+
+        <h4 style="font-size: 150%; position:relative; top:-50px">Long Motion</h4>
+        <h5 style="text-align: center; position: relative; top: -50px; font-size: 100%" id="long"></h5>
+
+        <h4 style="font-size: 150%; position:relative; top:-50px">Short Motion</h4>
+        <h5 style="text-align: center; position: relative; top: -50px; font-size: 100%" id="short"></h5>
+
+        <button style="font-size: 150%; position:relative; top:-50px" onclick="Reset()">Reset</button>
+    </div>
+    
+</aside>
+</body>
 <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
 <script>
   // Initialize Firebase
@@ -16,7 +104,6 @@
   };
   firebase.initializeApp(config);
 </script>
+<script src="./firebaseWebApi.js"></script>
 
-  <script src="./firebaseWebApi.js"></script>
-</body>
 </html>
