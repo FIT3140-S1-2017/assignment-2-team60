@@ -23,15 +23,15 @@ LongMotionData.on("value", function(snapshot) {   //this callback will be invoke
   console.log("The read failed: " + errorObject.code);
 });
 var ShortMotionData = db.ref("/Short Motion");
-ShortMotionData.on("value", function(snapshot) {   //this callback will be invoked with each new object
-  console.log(snapshot.val());         // How to retrive the new added object
-}, function (errorObject) {             // if error
+ShortMotionData.on("value", function(snapshot) {   
+  console.log(snapshot.val());         
+}, function (errorObject) {            
   console.log("The read failed: " + errorObject.code);
 });
 var TotalMotionData = db.ref("/Total Motion");
-TotalMotionData.on("value", function(snapshot) {   //this callback will be invoked with each new object
-  console.log(snapshot.val());         // How to retrive the new added object
-}, function (errorObject) {             // if error
+TotalMotionData.on("value", function(snapshot) {   
+  console.log(snapshot.val());         
+}, function (errorObject) {            
   console.log("The read failed: " + errorObject.code);
 });
 
@@ -67,8 +67,11 @@ var longmotion = 0;
 var shortmotion = 0;
 var bool;
 var booldata= true;
+var IntruderArray =[];
+var Intruder=0;
 //socket connection handler
 io.on('connection', function(socket){
+		
 		socket.on('led:on',  function(data){
 			led.on();
 			console.log('Led is on!');
@@ -95,15 +98,15 @@ io.on('connection', function(socket){
 					console.log("The read failed: " + errorObject.code);
 					});
 					var ShortMotionData = db.ref("/Short Motion");
-					ShortMotionData.on("value", function(snapshot) {   //this callback will be invoked with each new object
-					snapshot.val();         // How to retrive the new added object
-					}, function (errorObject) {             // if error
+					ShortMotionData.on("value", function(snapshot) {   
+					snapshot.val();         
+					}, function (errorObject) {             
 					console.log("The read failed: " + errorObject.code);
 					});
 					var TotalMotionData = db.ref("/Total Motion");
-					TotalMotionData.on("value", function(snapshot) {   //this callback will be invoked with each new object
-					snapshot.val();         // How to retrive the new added object
-					}, function (errorObject) {             // if error
+					TotalMotionData.on("value", function(snapshot) {   
+					snapshot.val();         
+					}, function (errorObject) {    
 					console.log("The read failed: " + errorObject.code);
 					});
 					booldata=true;
@@ -126,15 +129,27 @@ io.on('connection', function(socket){
 					socket.emit('total:motion', {motionno: total});
 					if (diff > 5000){
 						longmotion++;
+						IntruderArray.push("long");
 						TotalMotionData.push({id:'Long' ,type:'Motion' ,action:'Total Motion'});
 						LongMotionData.push({id:'Long' ,type:'Motion' ,action:'Long Motion',time:diff/1000});
 					} else{
 						shortmotion++;
+						IntruderArray.push("short");
 						TotalMotionData.push({id:'Short' ,type:'Motion' ,action:'Total Motion'});
 						ShortMotionData.push({id:'Short' ,type:'Motion' ,action:'Short Motion',time:diff/1000});
 					};
 					socket.emit('long:motion', {motionlong: longmotion});
 					socket.emit('short:motion', {motionshort: shortmotion});
+					socket.emit('intruder:motion',{motionIntruder: Intruder });
+					if (IntruderArray.length==4){
+						if (IntruderArray==['long','short','long','long']){
+							Intruder++;
+							socket.emit('intruder:motion',{motionIntruder: Intruder });
+							IntruderArray=[];
+
+						}
+					}
+
 				}
 			});
 		});
@@ -143,9 +158,12 @@ io.on('connection', function(socket){
 			total = 0;
 			longmotion = 0;
 		 	shortmotion = 0;
+			Intruder=0;
+			IntruderArray=[]
 			socket.emit('total:motion', {motionno: total});
 			socket.emit('long:motion', {motionlong: longmotion});
 			socket.emit('short:motion', {motionshort: shortmotion});
+			socket.emit('intruder:motion',{motionIntruder: Intruder });
 			ShortMotionData.remove();
 			LongMotionData.remove();
 			TotalMotionData.remove();

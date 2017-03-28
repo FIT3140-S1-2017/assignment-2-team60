@@ -29,6 +29,13 @@
                 socket.emit('motion:bool');
             }
             console.log('SENSOR ON');
+
+            socket.on('intruder:motion', function(data){
+                var w =data.motionIntruder;
+                var displayintruder= document.getElementById("intruder")
+                displayintruder.innerHTML = w;
+            });
+
             socket.on('total:motion', function(data){ //To increment the total motion in the webpage
                 var x = data.motionno;
                 var displaytotal = document.getElementById("total")
