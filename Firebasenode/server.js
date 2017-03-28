@@ -66,6 +66,7 @@ var total = 0;
 var longmotion = 0;
 var shortmotion = 0;
 var bool;
+var booldata= true;
 //socket connection handler
 io.on('connection', function(socket){
 		socket.on('led:on',  function(data){
@@ -86,6 +87,28 @@ io.on('connection', function(socket){
 			bool = true;
 			console.log('Motion On!');
 			motion.on("motionstart", function() {
+				if (booldata==false){
+					var LongMotionData = db.ref("/Long Motion");
+					LongMotionData.on("value", function(snapshot) {   //this callback will be invoked with each new object
+					snapshot.val();         // How to retrive the new added object
+					}, function (errorObject) {             // if error
+					console.log("The read failed: " + errorObject.code);
+					});
+					var ShortMotionData = db.ref("/Short Motion");
+					ShortMotionData.on("value", function(snapshot) {   //this callback will be invoked with each new object
+					snapshot.val();         // How to retrive the new added object
+					}, function (errorObject) {             // if error
+					console.log("The read failed: " + errorObject.code);
+					});
+					var TotalMotionData = db.ref("/Total Motion");
+					TotalMotionData.on("value", function(snapshot) {   //this callback will be invoked with each new object
+					snapshot.val();         // How to retrive the new added object
+					}, function (errorObject) {             // if error
+					console.log("The read failed: " + errorObject.code);
+					});
+					booldata=true;
+
+				}
 				if (bool === true){
 					console.log("Motion Detected!");
 					time1 = new Date().getTime();
@@ -115,6 +138,7 @@ io.on('connection', function(socket){
 				}
 			});
 		});
+
 		socket.on('reset', function(data){
 			total = 0;
 			longmotion = 0;
@@ -122,6 +146,10 @@ io.on('connection', function(socket){
 			socket.emit('total:motion', {motionno: total});
 			socket.emit('long:motion', {motionlong: longmotion});
 			socket.emit('short:motion', {motionshort: shortmotion});
+			ShortMotionData.remove();
+			LongMotionData.remove();
+			TotalMotionData.remove();
+			booldata=false;
 
 		});
 
