@@ -19,7 +19,7 @@ function Fit3140() {
     // Loads the last 50 messages and listen for new ones.
     var setMessage = function (data) {
       var val = data.val();
-      this.displayMessage(val.totaldata, val.longdata, val.shortdata, val,intruderdata);
+      this.displayMessage(val.totaldata, val.longdata, val.shortdata, val.intruderdata);
     }.bind(this);
     this.messagesRef.limitToLast(50).on('child_added', setMessage);
     this.messagesRef.limitToLast(50).on('child_changed', setMessage);
@@ -41,10 +41,10 @@ function Fit3140() {
   };
 
   Fit3140.prototype.displayMessage = function (totaldata, longdata, shortdata, intruderdata) {
-    document.getElementById('intruderid').innerHTML = intruderdata;
     document.getElementById('total').innerHTML = totaldata;
     document.getElementById('long').innerHTML = longdata;
     document.getElementById('short').innerHTML = shortdata;
+    document.getElementById('intruder').innerHTML = intruderdata;
   };
 
 
