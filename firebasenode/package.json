@@ -1,0 +1,19 @@
+{
+  "name": "firebasenode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.15.2",
+    "firebase": "^3.7.3",
+    "firebase-admin": "^4.1.4",
+    "johnny-five": "^0.10.6",
+    "socket.io": "^1.7.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
