@@ -32,7 +32,7 @@ var sensordb = db.ref("/motionSensorData"); // channel name
 var motiondb = db.ref("/Motion");
 
 
-var ledcounter = 0;
+var ledcounter = 0;						//This will set the led on or off
 leddb.on("value", function(snapshot) {   //this callback will be invoked with each new object
 	var dataled = snapshot.val();         // How to retrive the new added object
 	console.log(dataled);
@@ -44,11 +44,11 @@ leddb.on("value", function(snapshot) {   //this callback will be invoked with ea
 			leddb.push({id:'LED', type:'OFF'});
 		}
 	}else{
-		var ledtype = snapshot.val().type;
+		var ledtype = snapshot.val().type;		//from the firebase, if the type if ON, it will on the led
 		if (ledtype === 'ON'){
 			led.on();
 		}else{
-			led.off();
+			led.off();							//if type if OFF, it will off the led.
 		}
 	}
 }, function (errorObject) {             // if error
@@ -72,7 +72,7 @@ sensordb.on("value", function(snapshot) {   //this callback will be invoked with
 	console.log("The read failed: " + errorObject.code);
 });
 
-sensordb.on("child_added", function(snapshot){
+sensordb.on("child_added", function(snapshot){			// retrieve the newest data from firebase
 	total = snapshot.val().totaldata;
 	longmotion = snapshot.val().longdata;
 	shortmotion = snapshot.val().shortdata;
@@ -105,10 +105,10 @@ motiondb.on("value", function(snapshot) {   //this callback will be invoked with
 			motiondb.push({id:'motion', type:'OFF'});
 		}
 	}else{
-		var motiontype = snapshot.val().type;
+		var motiontype = snapshot.val().type;			//if type of motion is on, motion sensor will be on
 		if (motiontype === 'ON'){
 			bool = true;
-			if (once === 0){
+			if (once === 0){					//this is to on the motion sensor once
 				list = [];
 				motion.on("motionstart", function() {
 					if (bool === true){
@@ -116,13 +116,13 @@ motiondb.on("value", function(snapshot) {   //this callback will be invoked with
 						time1 = new Date().getTime();
 					}
 				});
-			}else{
+			}else{							//if motion sensor has on before, it will not on the motion sensor again
 				if (bool === true){
 					console.log("Motion start");
 					time1 = new Date().getTime();
 				}
 			}
-			if (once === 0){
+			if (once === 0){			//this is to stop the motion sensor if there is no motion
 				once++;
 				motion.on("motionend", function() {
 					if (bool === true){
@@ -152,7 +152,7 @@ motiondb.on("value", function(snapshot) {   //this callback will be invoked with
 						sensordb.push({totaldata:total, longdata:longmotion, shortdata:shortmotion, intruderdata:intruder});
 					}
 				});
-			}else{
+			}else{						//create motion sensor end only once
 				if (bool === true){
 					console.log("Motion end");
 					time2 = new Date().getTime();
@@ -180,7 +180,7 @@ motiondb.on("value", function(snapshot) {   //this callback will be invoked with
 					sensordb.push({totaldata:total, longdata:longmotion, shortdata:shortmotion, intruderdata:intruder});
 				}
 			}
-		}else{
+		}else{						//stop motion sensor when user click off button
 			bool = false;
 		}
 	}
